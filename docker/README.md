@@ -1,57 +1,67 @@
-# 🐳 Docker Compose 실습
+# 🐍 FastAPI 실습
 
-nginx 웹 서버를 Docker Compose로 실행해보는 실습입니다.
+FastAPI 백엔드를 Docker Compose로 실행하고, 라우터를 추가해보는 실습입니다.
 
 ## 폴더 구조
 
 ```
 docker/
-├── docker-compose.yml   # 서비스 정의
-├── README.md            # 이 파일
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
 └── app/
-    ├── Dockerfile       # nginx 이미지 빌드 설정
-    └── index.html       # 서빙할 웹 페이지
+    ├── main.py          # FastAPI 진입점 (라우터 등록 위치)
+    ├── requirements.txt
+    └── routers/
+        └── items.py     # 예시 라우터
 ```
 
-## 실습 순서
+## 실행 방법
 
-### 1. 컨테이너 빌드 & 백그라운드 실행
+```bash
+cd docker
+docker compose up -d --build
+```
+
+- 서버 주소: http://localhost:8000
+- Swagger UI: http://localhost:8000/docs
+
+## 라우터 추가 실습
+
+1. `app/routers/` 안에 새 파일을 만듭니다 (예: `users.py`)
+
+```python
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/users")
+def get_users():
+    return {"users": []}
+```
+
+2. `app/main.py`에 라우터를 등록합니다
+
+```python
+from fastapi import FastAPI
+from routers import items, users  # ← 추가
+
+app = FastAPI()
+
+app.include_router(items.router)
+app.include_router(users.router)  # ← 추가
+```
+
+3. 변경사항 반영
 
 ```bash
 docker compose up -d --build
 ```
 
-- `-d` : 백그라운드(detached) 모드로 실행
-- `--build` : 이미지를 새로 빌드한 뒤 실행
+4. http://localhost:8000/docs 에서 새 엔드포인트 확인
 
-### 2. 결과 확인
-
-브라우저에서 아래 주소를 열어보세요.
-
-```
-http://localhost:8080
-```
-
-### 3. 실행 중인 컨테이너 확인
-
-```bash
-docker compose ps
-```
-
-### 4. 로그 확인
-
-```bash
-docker compose logs -f
-```
-
-### 5. 컨테이너 중지 & 삭제
+## 컨테이너 종료
 
 ```bash
 docker compose down
 ```
-
-## 추가 실습 아이디어
-
-- `app/index.html`을 수정하고 `docker compose up -d --build`로 반영해보기
-- `docker-compose.yml`에서 포트 번호를 바꿔보기 (`8080:80` → `9090:80`)
-- `docker images` / `docker ps -a` 명령어로 이미지·컨테이너 목록 확인하기
