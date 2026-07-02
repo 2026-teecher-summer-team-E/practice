@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
-items = []
+item_list = []
 
 
 class Item(BaseModel):
@@ -12,10 +12,10 @@ class Item(BaseModel):
 
 @router.get("/items")
 def get_items():
-    return {"items": items}
+    return {"items": item_list}
 
 
-@router.post("/items")
+@router.post("/items", status_code=201)
 def create_item(item: Item):
-    items.append(item.name)
-    return {"items": items}
+    item_list.append(item.name)
+    return {"items": item_list}
