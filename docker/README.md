@@ -23,6 +23,9 @@ cd docker
 docker compose up -d --build
 ```
 
+- `-d` : 백그라운드(detached) 모드로 실행
+- `--build` : 이미지를 새로 빌드한 뒤 실행
+
 - 서버 주소: http://localhost:8000
 - Swagger UI: http://localhost:8000/docs
 
